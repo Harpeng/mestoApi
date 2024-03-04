@@ -60,6 +60,11 @@ export const deleteCard = async (req: Request, res: Response) => {
         .status(constants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: requestError });
     }
+    if (err instanceof Error && err.name === notFoundError) {
+      return res
+        .status(constants.HTTP_STATUS_NOT_FOUND)
+        .send({ message: err.message });
+    }
     return res
       .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
       .send({ message: serverError });
@@ -82,6 +87,11 @@ export const likeCard = async (req: Request, res: Response) => {
         .status(constants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: requestError });
     }
+    if (err instanceof Error && err.name === notFoundError) {
+      return res
+        .status(constants.HTTP_STATUS_NOT_FOUND)
+        .send({ message: err.message });
+    }
     return res
       .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
       .send({ message: serverError });
@@ -103,6 +113,11 @@ export const dislikeCard = async (req: Request, res: Response) => {
       return res
         .status(constants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: requestError });
+    }
+    if (err instanceof Error && err.name === notFoundError) {
+      return res
+        .status(constants.HTTP_STATUS_NOT_FOUND)
+        .send({ message: err.message });
     }
     return res
       .status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
