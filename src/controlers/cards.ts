@@ -1,13 +1,12 @@
-import { NextFunction, Request, Response } from "express";
-import Card from "../models/card";
-import { constants } from "http2";
+import { Request, Response } from 'express';
+import { constants } from 'http2';
+import { Error as MongooseError, ObjectId } from 'mongoose';
+import Card from '../models/card';
 import {
   notFoundError,
   requestError,
   serverError,
-} from "../constants/messages";
-import { Error as MongooseError, ObjectId } from "mongoose";
-import user from "models/user";
+} from '../constants/messages';
 
 export const getCard = async (req: Request, res: Response) => {
   try {
@@ -39,17 +38,16 @@ export const createCard = async (req: Request, res: Response) => {
   }
 };
 
-
 export const deleteCard = async (req: Request, res: Response) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findByIdAndDelete(cardId).orFail(() => {
-      const error = new Error("Карточка не найдена");
+      const error = new Error('Карточка не найдена');
       error.name = notFoundError;
       return error;
     });
     if (card.owner.toString() !== req.user?._id) {
-      const error = new Error("Удаление чужих карточек запрещено");
+      const error = new Error('Удаление чужих карточек запрещено');
       error.name = requestError;
       return error;
     }
@@ -75,11 +73,16 @@ export const likeCard = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
     const { cardId } = req.params;
-    const card = await Card.findByIdAndUpdate(cardId, {$addToSet: {likes: userId as unknown as ObjectId}},{new: true}).orFail(() => {
-      const error = new Error("Пользователь не найден");
-      error.name = notFoundError;
-      return error;
-    });
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { $addToSet: { likes: userId as unknown as ObjectId } },
+      { new: true },
+    )
+      .orFail(() => {
+        const error = new Error('Пользователь не найден');
+        error.name = notFoundError;
+        return error;
+      });
     return res.send(card);
   } catch (err) {
     if (err instanceof MongooseError.CastError) {
@@ -102,11 +105,16 @@ export const dislikeCard = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
     const { cardId } = req.params;
-    const card = await Card.findByIdAndUpdate(cardId, {$pull: {likes: userId as unknown as ObjectId}},{new: true}).orFail(() => {
-      const error = new Error("Пользователь не найден");
-      error.name = notFoundError;
-      return error;
-    });
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: userId as unknown as ObjectId } },
+      { new: true },
+    )
+      .orFail(() => {
+        const error = new Error('Пользователь не найден');
+        error.name = notFoundError;
+        return error;
+      });
     return res.send(card);
   } catch (err) {
     if (err instanceof MongooseError.CastError) {
@@ -124,5 +132,3 @@ export const dislikeCard = async (req: Request, res: Response) => {
       .send({ message: serverError });
   }
 };
-
-

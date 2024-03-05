@@ -1,23 +1,22 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 import validator from 'validator';
-
 
 const cardSchema = new Schema({
   name: {
     type: String,
-    required: [true, "Поле обязательно для заполнения"],
-    minLength: [2, "Минимальная длина 2 символа"],
-    maxLength: [30, "Максимальная длина 30 символов"]
+    required: [true, 'Поле обязательно для заполнения'],
+    minLength: [2, 'Минимальная длина 2 символа'],
+    maxLength: [30, 'Максимальная длина 30 символов'],
   },
   owner: {
     type: Schema.Types.ObjectId,
-    required: [true, "Поле обязательно для заполнения"],
+    required: [true, 'Поле обязательно для заполнения'],
     ref: 'user',
   },
   link: {
     type: String,
     validate: (v: string) => validator.isURL(v),
-    required: [true, "Поле обязательно для заполнения"],
+    required: [true, 'Поле обязательно для заполнения'],
   },
   likes: {
     type: [Schema.Types.ObjectId],
@@ -26,8 +25,8 @@ const cardSchema = new Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
-})
+    default: Date.now,
+  },
+});
 
 export default model('card', cardSchema);

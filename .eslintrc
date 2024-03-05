@@ -34,6 +34,7 @@
         "allow": ["_id"]
       }
     ],
-    "linebreak-style": "off"
+    "linebreak-style": "off",
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
   }
 }
