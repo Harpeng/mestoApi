@@ -7,6 +7,7 @@ import {
   requestError,
   serverError,
 } from '../constants/messages';
+import { CustomRequest } from '../types/express';
 
 export const getCard = async (req: Request, res: Response) => {
   try {
@@ -19,7 +20,7 @@ export const getCard = async (req: Request, res: Response) => {
   }
 };
 
-export const createCard = async (req: Request, res: Response) => {
+export const createCard = async (req: CustomRequest, res: Response) => {
   try {
     const owner = req.user?._id;
     const { name, link } = req.body;
@@ -38,7 +39,7 @@ export const createCard = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteCard = async (req: Request, res: Response) => {
+export const deleteCard = async (req: CustomRequest, res: Response) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findByIdAndDelete(cardId).orFail(() => {
@@ -69,7 +70,7 @@ export const deleteCard = async (req: Request, res: Response) => {
   }
 };
 
-export const likeCard = async (req: Request, res: Response) => {
+export const likeCard = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?._id;
     const { cardId } = req.params;
@@ -101,7 +102,7 @@ export const likeCard = async (req: Request, res: Response) => {
   }
 };
 
-export const dislikeCard = async (req: Request, res: Response) => {
+export const dislikeCard = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?._id;
     const { cardId } = req.params;

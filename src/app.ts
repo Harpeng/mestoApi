@@ -1,6 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express, {
-  NextFunction, Request, Response, json,
+  NextFunction,
+  Request,
+  Response,
+  json,
 } from 'express';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mongoose from 'mongoose';
@@ -8,6 +11,10 @@ import mongoose from 'mongoose';
 import helmet from 'helmet';
 import router from './routes';
 import limiter from './utils/limiter';
+import { createUser, loginUser } from './controlers/users';
+import auth from './middlewares/auth';
+import { requestLogger, errorLogger } from './middlewares/logger';
+import { validateCreateUser, validateLogin } from './middlewares/validation';
 
 const { PORT = 3000 } = process.env;
 
@@ -19,15 +26,30 @@ app.use(helmet());
 
 app.use(limiter);
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '65e0cc132525639f15a1b0eb',
-  };
+app.use(requestLogger);
+
+app.post('/signin', validateLogin, loginUser);
+app.post('/signup', validateCreateUser, createUser);
+
+app.use(auth);
+
+app.use(router);
+
+app.use(errorLogger);
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
 
   next();
 });
-
-app.use(router);
 
 const connect = async () => {
   try {
