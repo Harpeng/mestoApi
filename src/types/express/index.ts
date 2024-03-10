@@ -6,3 +6,9 @@ export interface CustomRequest extends Request {
     _id: any;
   };
 }
+
+export type Error = {
+  statusCode: number;
+  message: string;
+  name: string;
+};

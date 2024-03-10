@@ -1,19 +1,17 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import express, {
-  NextFunction,
-  Request,
-  Response,
-  json,
-} from 'express';
+import express, { json } from 'express';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mongoose from 'mongoose';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import helmet from 'helmet';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { errors } from 'celebrate';
 import router from './routes';
 import limiter from './utils/limiter';
 import { createUser, loginUser } from './controlers/users';
 import auth from './middlewares/auth';
 import { requestLogger, errorLogger } from './middlewares/logger';
+import errorsMiddlewares from './middlewares/error';
 import { validateCreateUser, validateLogin } from './middlewares/validation';
 
 const { PORT = 3000 } = process.env;
@@ -22,11 +20,11 @@ const app = express();
 
 app.use(json());
 
+app.use(requestLogger);
+
 app.use(helmet());
 
 app.use(limiter);
-
-app.use(requestLogger);
 
 app.post('/signin', validateLogin, loginUser);
 app.post('/signup', validateCreateUser, createUser);
@@ -37,19 +35,9 @@ app.use(router);
 
 app.use(errorLogger);
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  const { statusCode = 500, message } = err;
+app.use(errors());
 
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-
-  next();
-});
+app.use(errorsMiddlewares);
 
 const connect = async () => {
   try {
