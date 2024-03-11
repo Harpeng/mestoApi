@@ -9,6 +9,7 @@ import {
 import { CustomRequest } from '../types/express';
 import BadRequestError from '../errors/bad-request-error';
 import NotFoundError from '../errors/not-found-error';
+import ForbiddenError from '../errors/forbidden-error';
 
 export const getCard = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -37,11 +38,12 @@ export const createCard = async (req: CustomRequest, res: Response, next: NextFu
 export const deleteCard = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findByIdAndDelete(cardId)
+    const card = await Card.findById(cardId)
       .orFail(() => new NotFoundError(notFoundError));
     if (card.owner.toString() !== req.user?._id) {
-      return new BadRequestError('Удаление чужих карточек запрещено');
+      return next(new ForbiddenError('Удаление чужих карточек запрещено'));
     }
+    await card.deleteOne();
     return res.send(card);
   } catch (err) {
     if (err instanceof MongooseError.CastError) {

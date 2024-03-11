@@ -86,12 +86,12 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     ))
     .catch((err) => {
       if (err instanceof MongooseError.ValidationError) {
-        next(new BadRequestError(requestError));
+        return next(new BadRequestError(requestError));
       }
-      if (err instanceof Error && err.message.startsWith('E11000')) {
-        next(new ConflictError(conflictError));
+      if (err.code === 11000) {
+        return next(new ConflictError(conflictError));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -103,7 +103,7 @@ export const loginUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => {
       bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return new UnauthorizedError(unauthorized);
+          return next(new UnauthorizedError(unauthorized));
         }
 
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
@@ -116,7 +116,7 @@ export const loginUser = (req: Request, res: Response, next: NextFunction) => {
       if (err instanceof Error && err.name === unauthorized) {
         return next(new UnauthorizedError(unauthorized));
       }
-      return next();
+      return next(err);
     });
 };
 

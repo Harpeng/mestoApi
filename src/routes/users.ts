@@ -12,11 +12,11 @@ const userRouter = Router();
 
 userRouter.get('/', getUser);
 
+userRouter.get('/me', getCurrentUser);
+
 userRouter.get('/:userId', validateUser, getUserById);
 
 userRouter.patch('/me', validateUpdateUser, updateUser);
-
-userRouter.get('/me', getCurrentUser);
 
 userRouter.patch('/me/avatar', validateUpdateAvatar, updateUserAvatar);
 

@@ -15,7 +15,7 @@ export default (req: SessionRequest, res: Response, next: NextFunction) => {
   if (!authorization || !authorization.startsWith('Bearer ')) {
     next(new UnauthorizedError(unauthorized));
   }
-  const token = authorization?.replace('Bearer', '');
+  const token = authorization?.replace('Bearer ', '');
   let payload;
 
   try {
